@@ -9,7 +9,7 @@ import swaggerSpec from "./docs/swaggerDocs.js";
 import connectDB from "./config/connectedDB.js";
 import { CORSOPTIONS, RATE_LIMIT_OPTIONS } from "./constants/index.js";
 import authRoutes from "./routes/authRoutes.js";
-import notificationRoutes from "./routes/NotificationRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import clientsRoutes from "./routes/clientsRoutes.js";
 import callsRoutes from "./routes/callsRoutes.js";
 import botRoutes from "./routes/botRoutes.js";
