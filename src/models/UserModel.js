@@ -1,0 +1,46 @@
+import { Schema, model } from 'mongoose';
+import { config } from "dotenv";
+config();
+const userSchema = new Schema({
+  fullName: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: false,
+  },
+  address: {
+    type: String,
+    required: false,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'client'],
+    default: 'user',
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  avatar: {
+    type: String,
+    required: false,
+    default: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1735715517/avatars/default-avatar.png.jpg`,
+  }
+}, {
+  timestamps: true,
+});
+
+const User = model('User', userSchema, 'users');
+
+export default User;

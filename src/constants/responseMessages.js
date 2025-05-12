@@ -1,0 +1,9 @@
+export const USER_REGISTER_SUCCESS = 'User registered successfully';
+export const USER_REGISTER_FAIL = 'User registration failed';
+export const USER_LOGIN_SUCCESS = 'User logged in successfully';
+export const USER_LOGIN_FAIL = 'User login failed';
+export const USER_NOT_FOUND = 'User not found';
+export const USER_ALREADY_EXISTS = 'User already exists';
+export const INVALID_PASSWORD = 'Invalid password';
+export const USER_LOGOUT_SUCCESS = "Logged out successfully";
+export const UNAUTHORIZED = "Unauthorized";
