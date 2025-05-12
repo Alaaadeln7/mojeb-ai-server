@@ -1,2 +1,7 @@
 # mojeb-ai-server
-the server of mojeb-ai
+
+mojeb ai server
+
+# live
+
+https://portfolioserver-0qyd.onrender.com
