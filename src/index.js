@@ -18,6 +18,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { app, server } from "./config/socket.js";
+import MongoStore from "connect-mongo";
 config();
 // connect to the database
 connectDB();
