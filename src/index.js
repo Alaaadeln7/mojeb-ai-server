@@ -33,10 +33,19 @@ app.use(rateLimit(RATE_LIMIT_OPTIONS));
 app.use(express.json({ limit: "10mb" }));
 app.use(
   session({
-    secret: process.env.SECRET_KEY_SESSION,
+    secret: process.env.SECRET_KEY_SESSION || "my_secret",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === "production" },
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_URL,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    },
   })
 );
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
