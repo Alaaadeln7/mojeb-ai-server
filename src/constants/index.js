@@ -1,5 +1,9 @@
 export const CORSOPTIONS = {
-  origin: ["https://mojeb-ai-client.vercel.app", "http://localhost:3000"],
+  // origin: ["https://mojeb-ai-client.vercel.app", "http://localhost:3000"],
+  origin:
+    process.env.NODE_ENV === "production"
+      ? process.env.CLIENT_URL
+      : "http://localhost:3000",
   credentials: true,
 };
 export const JWT_EXPIRES_IN = "30d";
