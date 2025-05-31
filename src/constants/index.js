@@ -1,3 +1,5 @@
+import { config } from "dotenv";
+config();
 export const CORSOPTIONS = {
   // origin: ["https://mojeb-ai-client.vercel.app", "http://localhost:3000"],
   origin:
@@ -6,6 +8,7 @@ export const CORSOPTIONS = {
       : "http://localhost:3000",
   credentials: true,
 };
+console.log(process.env.CLIENT_URL);
 export const JWT_EXPIRES_IN = "30d";
 export const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 export const JWT_COOKIE_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
