@@ -171,7 +171,6 @@ export const forgetPassword = asyncHandler(async (req, res) => {
   );
 });
 
-
 export const verifyForgetPasswordOTP = asyncHandler(async (req, res) => {
   const { otp } = req.body;
   const { email } = req.session.tempUser;
@@ -185,7 +184,6 @@ export const verifyForgetPasswordOTP = asyncHandler(async (req, res) => {
     "OTP verified successfully. You can now reset your password."
   );
 });
-
 
 export const resetPassword = asyncHandler(async (req, res) => {
   const { password } = req.body;

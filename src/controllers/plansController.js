@@ -1,20 +1,36 @@
-const createPlan = asyncHandler(async (req, res) => {
-  const { title, price, features, description } = req.body;
-  const existingPlan = await Plan.findOne({ title });
-  if (existingPlan) {
-    return responseHandler(res, 400, "Plan already exists");
+import asyncHandler from "../middlewares/asyncHandler.js";
+import Plan from "../models/PlanModel.js";
+import { planValidationSchema } from "../utils/planValidation.js";
+import responseHandler from "../utils/response.js";
+import * as yup from "yup";
+export const createPlan = asyncHandler(async (req, res) => {
+  try {
+    const validatedData = await planValidationSchema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+    // Create and save new plan
+    const newPlan = await Plan.create(validatedData);
+    return responseHandler(res, 201, "Plan created successfully");
+  } catch (error) {
+    if (error instanceof yup.ValidationError) {
+      const errors = error.inner.reduce((acc, curr) => {
+        acc[curr.path] = curr.message;
+        return acc;
+      }, {});
+
+      return responseHandler(res, 400, "Validation failed", { errors });
+    }
+    throw error;
   }
-  const newPlan = new Plan({ title, price, features, description });
-  await newPlan.save();
-  return responseHandler(res, 200, "Plan created successfully");
 });
 
-const getAllPlans = asyncHandler(async (req, res) => {
+export const getAllPlans = asyncHandler(async (req, res) => {
   const plans = await Plan.find();
   return responseHandler(res, 200, "Plans fetched successfully", plans);
 });
 
-const deletePlans = asyncHandler(async (req, res) => {
+export const deletePlans = asyncHandler(async (req, res) => {
   const { planId } = req.params;
   const deletingPlan = await Plan.findByIdAndDelete(planId);
   if (!deletingPlan) {
@@ -23,7 +39,7 @@ const deletePlans = asyncHandler(async (req, res) => {
   return responseHandler(res, 200, "Plan deleted successfully");
 });
 
-const updatePlan = asyncHandler(async (req, res) => {
+export const updatePlan = asyncHandler(async (req, res) => {
   const { planId } = req.params;
   const { title, price, features, description } = req.body;
   const updatingPlan = await Plan.findByIdAndUpdate(
@@ -37,7 +53,7 @@ const updatePlan = asyncHandler(async (req, res) => {
   return responseHandler(res, 200, "Plan updated successfully");
 });
 
-const getSinglePlan = asyncHandler(async (req, res) => {
+export const getSinglePlan = asyncHandler(async (req, res) => {
   const { planId } = req.params;
   const plan = await Plan.findById(planId);
   if (!plan) {

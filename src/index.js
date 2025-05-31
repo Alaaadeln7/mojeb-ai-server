@@ -10,9 +10,9 @@ import { CORSOPTIONS, RATE_LIMIT_OPTIONS } from "./constants/index.js";
 import authRoutes from "./routes/authRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import clientsRoutes from "./routes/clientsRoutes.js";
-import callsRoutes from "./routes/callsRoutes.js";
-import botRoutes from "./routes/botRoutes.js";
 import chatBotRoutes from "./routes/chatbotRoutes.js";
+import planRoutes from "./routes/plansRoutes.js";
+import callsRoutes from "./routes/callsRoutes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -53,10 +53,9 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/clients", clientsRoutes);
-app.use("/api/calls", callsRoutes);
-app.use("/api/bot", botRoutes);
 app.use("/api/chatbot", chatBotRoutes);
-
+app.use("/api/plans", planRoutes);
+app.use("/api/calls", callsRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });

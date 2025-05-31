@@ -1,63 +1,74 @@
-import KnowledgeBase from '../models/KnowledgeBaseModel.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import responseHandler from '../utils/response.js';
-import textToSpeech from '@google-cloud/text-to-speech';
-import fs from 'fs';
-import util from 'util';
-const client = new textToSpeech.TextToSpeechClient();
+import asyncHandler from "../middlewares/asyncHandler.js";
+import responseHandler from "../utils/response.js";
+import Chatbot from "../models/ChatbotModel.js";
+import Knowledge from "../models/KnowledgeModel.js";
 
-/**
- * @desc    Respond to a user question
- * @route   POST /api/chatbot/ask
- * @access  Public
- */
-export const askBot = asyncHandler(async (req, res) => {
+export const getChatbot = asyncHandler(async (req, res) => {
+  const { clientId } = req.params;
 
-  const { question } = req.body;
-  const foundQuestion = await KnowledgeBase.findOne({ question });
+  const chatbot = await Chatbot.findOne({ clientId })
+    .populate("knowledge")
+    .select(" -__v");
 
-  if (foundQuestion) {
-    if (foundQuestion) {
-      const request = {
-        input: { text: foundQuestion.answer },
-        voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
-        audioConfig: { audioEncoding: 'MP3' },
-      };
-      const [response] = await client.synthesizeSpeech(request);
-
-      const writeFile = util.promisify(fs.writeFile);
-      await writeFile('output.mp3', response.audioContent, 'binary');
-      console.log('Audio content written to file: output.mp3');
-
-      return responseHandler(
-        res,
-        200,
-        "Question found in the knowledge base"
-        , { question: foundQuestion.question, answer: foundQuestion.answer });
-
-    } else {
-      return responseHandler(res, 404, "Question not found in the knowledge base", null);
-    }
+  if (!chatbot) {
+    return responseHandler(res, 404, "Chatbot not found");
   }
+
+  return responseHandler(res, 200, "Chatbot fetched successfully", chatbot);
 });
 
-/**
- * @desc    Add a new question and answer to the knowledge base
- * @route   POST /api/chatbot/add
- * @access  Public
- */
-export const addQuestion = asyncHandler(async (req, res) => {
-
+export const addInquiry = asyncHandler(async (req, res) => {
+  const { chatbotId } = req.params;
   const { question, answer } = req.body;
 
-  const existingQuestion = await KnowledgeBase.findOne({ question });
-  if (existingQuestion) {
-    return res.status(400).json({ message: "The question already exists." });
+  const knowledge = await Knowledge.findOne({ chatbotId });
+  console.log(knowledge);
+  console.log(chatbotId);
+  if (!knowledge) {
+    return responseHandler(res, 404, "Knowledge not found");
   }
 
-  const newEntry = new KnowledgeBase({ question, answer });
-  await newEntry.save();
+  knowledge.inquiries.push({ question, answer });
+  await knowledge.save();
 
-  return responseHandler(res, 201, "Question added successfully", newEntry);
+  return responseHandler(res, 200, "Inquiry added successfully", knowledge);
+});
 
+export const updateInquiry = asyncHandler(async (req, res) => {
+  const { chatbotId, index } = req.params;
+  const { question, answer } = req.body;
+
+  const knowledge = await Knowledge.findOne({ chatbotId });
+  if (!knowledge) {
+    return responseHandler(res, 404, "Knowledge not found");
+  }
+
+  if (!knowledge.inquiries[index]) {
+    return responseHandler(res, 404, "Inquiry not found");
+  }
+
+  if (question) knowledge.inquiries[index].question = question;
+  if (answer) knowledge.inquiries[index].answer = answer;
+
+  await knowledge.save();
+
+  return responseHandler(res, 200, "Inquiry updated successfully", knowledge);
+});
+
+export const deleteInquiry = asyncHandler(async (req, res) => {
+  const { inquiryId } = req.params;
+
+  const knowledge = await Knowledge.findOne({ inquiryId });
+  if (!knowledge) {
+    return responseHandler(res, 404, "Knowledge not found");
+  }
+
+  if (!knowledge.inquiries[index]) {
+    return responseHandler(res, 404, "Inquiry not found");
+  }
+
+  knowledge.inquiries.splice(index, 1);
+  await knowledge.save();
+
+  return responseHandler(res, 200, "Inquiry deleted successfully", knowledge);
 });

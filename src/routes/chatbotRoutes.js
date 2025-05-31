@@ -1,16 +1,13 @@
 import express from "express";
-const router = express.Router();
-import { askBot, addQuestion } from "../controllers/chatbotController.js";
+import {
+  addInquiry,
+  deleteInquiry,
+  getChatbot,
+} from "../controllers/chatbotController.js";
 import { protectRoute } from "../middlewares/protectRoute.js";
-import { checkAdminRole } from "../middlewares/checkUserRole.js";
+const router = express.Router();
 
-/**
- * @desc    Respond to a user question
- * @route   POST /api/chatbot/ask
- * @access  Public
- * @params  {question}
- */
-router.post("/ask", protectRoute, askBot);
-router.post("/add", protectRoute, checkAdminRole, addQuestion);
-
+router.get("/:clientId", protectRoute, getChatbot);
+router.post("/:chatbotId/create", protectRoute, addInquiry);
+router.delete("/delete/:inquiryId", protectRoute, deleteInquiry);
 export default router;

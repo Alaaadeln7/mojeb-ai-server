@@ -29,10 +29,6 @@ const userSchema = new Schema(
       enum: ["admin", "client"],
       default: "client",
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
     avatar: {
       type: String,
       required: false,
