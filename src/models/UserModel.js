@@ -29,11 +29,6 @@ const userSchema = new Schema(
       enum: ["admin", "client"],
       default: "client",
     },
-    avatar: {
-      type: String,
-      required: false,
-      default: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/v1735715517/avatars/default-avatar.png.jpg`,
-    },
   },
   {
     timestamps: true,

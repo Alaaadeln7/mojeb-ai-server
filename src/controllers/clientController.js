@@ -98,7 +98,14 @@ export const createClient = asyncHandler(async (req, res) => {
 });
 
 export const getClients = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || process.env.DEFAULT_PAGE_COUNT;
+  const limit = parseInt(req.query.limit) || process.env.DEFAULT_LIMIT_COUNT;
+  const skip = (page - 1) * limit;
+  const totalClients = await Client.countDocuments();
+
   const clients = await Client.find()
+    .skip(skip)
+    .limit(limit)
     .populate({
       path: "subscription",
       select: "active expireAt",
@@ -110,12 +117,13 @@ export const getClients = asyncHandler(async (req, res) => {
     isActive: client.subscription?.expireAt > new Date() || false,
   }));
 
-  return responseHandler(
-    res,
-    200,
-    "Clients fetched successfully",
-    clientsWithActiveStatus
-  );
+  return responseHandler(res, 200, "Clients fetched successfully", {
+    total: totalClients,
+    page,
+    limit,
+    totalPages: Math.ceil(totalClients / limit),
+    clients: clientsWithActiveStatus,
+  });
 });
 export const getSingleClient = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -140,4 +148,13 @@ export const deleteClient = asyncHandler(async (req, res) => {
     return responseHandler(res, 404, "Client not found");
   }
   return responseHandler(res, 200, "Client deleted successfully");
+});
+export const searchClient = asyncHandler(async (req, res) => {
+  const search = req.params.search || "";
+
+  const clients = await Client.find({
+    name: { $regex: search, $options: "i" },
+  });
+
+  return responseHandler(res, 200, "Clients fetched successfully", clients);
 });

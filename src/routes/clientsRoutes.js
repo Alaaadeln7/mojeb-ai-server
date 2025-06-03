@@ -4,6 +4,7 @@ import {
   deleteClient,
   getClients,
   getSingleClient,
+  searchClient,
   updateClient,
 } from "../controllers/clientController.js";
 import { protectRoute } from "../middlewares/protectRoute.js";
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post("/create", protectRoute, checkAdminRole, createClient);
 router.get("/", protectRoute, checkAdminRole, getClients);
+router.get("/search/:search", protectRoute, checkAdminRole, searchClient);
 router.delete("/:id", protectRoute, checkAdminRole, deleteClient);
 router.get("/:id", protectRoute, checkAdminRole, getSingleClient);
 router.put("/:id", protectRoute, checkAdminRole, updateClient);

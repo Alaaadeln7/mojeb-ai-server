@@ -17,7 +17,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { app, server } from "./config/socket.js";
-import mongoose from "mongoose";
+import MongoStore from "connect-mongo";
 
 config();
 
@@ -25,10 +25,14 @@ connectDB();
 
 app.use(
   session({
-    store: mongoose.connection.session,
-    secret: process.env.SECRET_KEY_SESSION || "my_secret",
+    secret: process.env.SECRET_KEY_SESSION || "my_secret_key",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_URL,
+      collectionName: "sessions",
+      ttl: 60 * 60 * 24,
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
@@ -37,7 +41,6 @@ app.use(
     },
   })
 );
-
 const PORT = process.env.PORT || 3000;
 app.use(helmet());
 app.use(cors(CORSOPTIONS));

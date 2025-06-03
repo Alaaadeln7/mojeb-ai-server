@@ -1,7 +1,5 @@
 import express from "express";
 import {
-  register,
-  verifyOTP,
   login,
   logout,
   checkAuth,
@@ -10,13 +8,15 @@ import {
   forgetPassword,
   resetPassword,
   verifyForgetPasswordOTP,
+  getAllUsers,
+  createUser,
 } from "../controllers/authController.js";
 import { protectRoute } from "../middlewares/protectRoute.js";
-
+import { checkAdminRole } from "../middlewares/checkUserRole.js";
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/verify-otp", verifyOTP);
+// router.post("/verify-otp", verifyOTP);
+router.post("/create-user", protectRoute, checkAdminRole, createUser);
 router.post("/login", login);
 router.post("/logout", logout);
 router.get("/check-auth", protectRoute, checkAuth);
@@ -25,4 +25,5 @@ router.post("/forget-password", forgetPassword);
 router.post("/verify-otp-forget-password", verifyForgetPasswordOTP);
 router.post("/reset-password", resetPassword);
 router.delete("/delete-account", protectRoute, deleteAccount);
+router.get("/users", protectRoute, checkAdminRole, getAllUsers);
 export default router;

@@ -22,74 +22,102 @@ import {
 } from "../middlewares/generateOTP.js";
 import OTP from "../models/OtpModel.js";
 
-export const register = asyncHandler(async (req, res) => {
-  const { fullName, email, password } = req.body;
+// export const register = asyncHandler(async (req, res) => {
+//   const { fullName, email, password } = req.body;
+
+//   const validData = await registerValidationSchema.validate(req.body, {
+//     abortEarly: false,
+//   });
+
+//   const userExists = await User.findOne({ email });
+//   if (userExists) {
+//     return responseHandler(res, 400, USER_ALREADY_EXISTS);
+//   }
+
+//   const otp = generateOTP();
+//   await OTP.create({ email, otp, expiresAt: Date.now() + 10 * 60 * 1000 });
+//   req.session.tempUser = { fullName, email, password };
+//   console.log(req.session.tempUser);
+//   await sendVerificationEmail(email, otp);
+//   return responseHandler(
+//     res,
+//     200,
+//     "OTP sent to your email. Please verify to complete registration."
+//   );
+// });
+
+// export const verifyOTP = asyncHandler(async (req, res) => {
+//   if (!req.session.tempUser) {
+//     return responseHandler(res, 400, "Session expired or not found.");
+//   }
+
+//   const { otp } = req.body;
+//   const { email, fullName, password } = req.session.tempUser;
+//   const storedOTP = await OTP.findOne({ email });
+//   if (
+//     !storedOTP ||
+//     storedOTP.otp !== otp ||
+//     !storedOTP.expiresAt ||
+//     storedOTP.expiresAt < Date.now()
+//   ) {
+//     return responseHandler(res, 400, "Invalid or expired OTP.");
+//   }
+
+//   const hashedPassword = await bcrypt.hash(password, 12);
+
+//   try {
+//     const newUser = await User.create({
+//       fullName,
+//       email,
+//       password: hashedPassword,
+//     });
+
+//     if (!newUser) {
+//       return responseHandler(res, 400, USER_REGISTER_FAIL);
+//     }
+
+//     generateToken(res, newUser?._id);
+//     await OTP.deleteOne({ email });
+
+//     req.session.destroy((err) => {
+//       if (err) {
+//         console.error("Failed to destroy session:", err);
+//       }
+//     });
+
+//     return responseHandler(res, 201, USER_REGISTER_SUCCESS);
+//   } catch (error) {
+//     console.error("Database error:", error);
+//     return responseHandler(res, 500, "Internal Server Error.");
+//   }
+// });
+
+export const createUser = asyncHandler(async (req, res) => {
+  const { fullName, email, password, role } = req.body;
 
   const validData = await registerValidationSchema.validate(req.body, {
     abortEarly: false,
   });
 
   const userExists = await User.findOne({ email });
+
   if (userExists) {
     return responseHandler(res, 400, USER_ALREADY_EXISTS);
   }
 
-  const otp = generateOTP();
-  await OTP.create({ email, otp, expiresAt: Date.now() + 10 * 60 * 1000 });
-  req.session.tempUser = { fullName, email, password };
-  await sendVerificationEmail(email, otp);
-  return responseHandler(
-    res,
-    200,
-    "OTP sent to your email. Please verify to complete registration."
-  );
-});
-
-export const verifyOTP = asyncHandler(async (req, res) => {
-  if (!req.session.tempUser) {
-    return responseHandler(res, 400, "Session expired or not found.");
-  }
-
-  const { otp } = req.body;
-  const { email, fullName, password } = req.session.tempUser;
-
-  const storedOTP = await OTP.findOne({ email });
-  if (
-    !storedOTP ||
-    storedOTP.otp !== otp ||
-    !storedOTP.expiresAt ||
-    storedOTP.expiresAt < Date.now()
-  ) {
-    return responseHandler(res, 400, "Invalid or expired OTP.");
-  }
-
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  try {
-    const newUser = await User.create({
-      fullName,
-      email,
-      password: hashedPassword,
-    });
+  const newUser = await User.create({
+    fullName,
+    email,
+    password: hashedPassword,
+    role,
+  });
 
-    if (!newUser) {
-      return responseHandler(res, 400, USER_REGISTER_FAIL);
-    }
-
-    generateToken(res, newUser?._id);
-    await OTP.deleteOne({ email });
-
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Failed to destroy session:", err);
-      }
-    });
-
-    return responseHandler(res, 201, USER_REGISTER_SUCCESS);
-  } catch (error) {
-    console.error("Database error:", error);
-    return responseHandler(res, 500, "Internal Server Error.");
+  if (!newUser) {
+    return responseHandler(res, 400, USER_REGISTER_FAIL);
   }
+  return responseHandler(res, 201, USER_REGISTER_SUCCESS);
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -211,4 +239,24 @@ export const updateProfileInfo = asyncHandler(async (req, res) => {
     return responseHandler(res, 404, USER_NOT_FOUND);
   }
   return responseHandler(res, 200, "Profile updated successfully.");
+});
+
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || process.env.DEFAULT_PAGE_COUNT;
+  const limit = parseInt(req.query.limit) || process.env.DEFAULT_LIMIT_COUNT;
+  const skip = (page - 1) * limit;
+  const totalUsers = await User.countDocuments();
+
+  const users = await User.find()
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  return responseHandler(res, 200, "Users fetched successfully", {
+    total: totalUsers,
+    page,
+    limit,
+    users,
+    totalPages: Math.ceil(totalUsers / limit),
+  });
 });
