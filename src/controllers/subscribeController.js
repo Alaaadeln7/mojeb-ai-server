@@ -1,3 +1,4 @@
+import asyncHandler from "../middlewares/asyncHandler.js";
 export const makeSubscription = asyncHandler(async (req, res) => {
   const { userId, planId } = req.body;
   const existingSubscription = await Subscribe.find({
@@ -14,4 +15,4 @@ export const cancelSubscription = asyncHandler(async (req, res) => {
   const { userId } = req.body;
   await Subscribe.findOneAndDelete({ user: userId });
   return responseHandler(res, 200, "Subscription cancelled successfully");
-})
+});

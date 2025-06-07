@@ -8,11 +8,12 @@ import swaggerSpec from "./docs/swaggerDocs.js";
 import connectDB from "./config/connectedDB.js";
 import { CORSOPTIONS, RATE_LIMIT_OPTIONS } from "./constants/index.js";
 import authRoutes from "./routes/authRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
+// import notificationRoutes from "./routes/notificationRoutes.js";
 import clientsRoutes from "./routes/clientsRoutes.js";
 import chatBotRoutes from "./routes/chatbotRoutes.js";
 import planRoutes from "./routes/plansRoutes.js";
 import callsRoutes from "./routes/callsRoutes.js";
+import twilioRoutes from "./routes/twilioRoutes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -54,11 +55,12 @@ app.use(express.json({ limit: "10mb" }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/notifications", notificationRoutes);
+// app.use("/api/notifications", notificationRoutes);
 app.use("/api/clients", clientsRoutes);
 app.use("/api/chatbot", chatBotRoutes);
 app.use("/api/plans", planRoutes);
 app.use("/api/calls", callsRoutes);
+app.use("/api/twilio", twilioRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });
