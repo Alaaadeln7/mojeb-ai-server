@@ -5,12 +5,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "dev": "NODE_ENV=development node --watch src/index.js",
+    "start": "NODE_ENV=production node src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prestart": "npm run lint",
+    "pretest": "npm run lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^9.8.0"
+  },
   "dependencies": {
     "@google-cloud/speech": "^7.1.0",
     "@google-cloud/text-to-speech": "^6.1.0",
@@ -19,6 +26,7 @@
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "csurf": "^1.11.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-mongo-sanitize": "^2.2.0",
@@ -35,8 +43,5 @@
     "ws": "^8.18.2",
     "xss-clean": "^0.1.4",
     "yup": "^1.6.1"
-  },
-  "devDependencies": {
-    "@faker-js/faker": "^9.8.0"
   }
 }

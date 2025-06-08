@@ -19,14 +19,13 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { app, server } from "./config/socket.js";
 import MongoStore from "connect-mongo";
-
 config();
 
 connectDB();
 
 app.use(
   session({
-    secret: process.env.SECRET_KEY_SESSION || "my_secret_key",
+    secret: process.env.SECRET_KEY_SESSION,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -43,12 +42,31 @@ app.use(
   })
 );
 const PORT = process.env.PORT || 3000;
-app.use(helmet());
+// Security middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: true,
+    crossOriginEmbedderPolicy: true,
+  })
+);
+
+// CORS configuration
 app.use(cors(CORSOPTIONS));
+
+// Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Logging
 app.use(morgan("dev"));
+
+// Cookie parser
 app.use(cookieParser());
+
+// Rate limiting
+const limiter = rateLimit(RATE_LIMIT_OPTIONS);
+app.use(limiter);
+
 app.use(rateLimit(RATE_LIMIT_OPTIONS));
 app.use(express.json({ limit: "10mb" }));
 
