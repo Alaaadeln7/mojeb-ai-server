@@ -6,14 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development node --watch src/index.js",
-    "start": "NODE_ENV=production node src/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "prestart": "npm run lint",
-    "pretest": "npm run lint"
+    "start": "NODE_ENV=production node src/index.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0"
