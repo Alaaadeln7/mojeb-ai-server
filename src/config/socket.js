@@ -53,9 +53,10 @@ wss.on("connection", (ws) => {
 
         case "media":
           if (recognizeStream && msg.media.payload) {
-            const audioBuffer = Buffer.from(msg.media.payload, "base64"); // ✅ Fix: base64 decode
+            const audioBuffer = Buffer.from(msg.media.payload, "base64");
             recognizeStream.write(audioBuffer);
           }
+          console.log(msg.media.payload);
           break;
 
         case "stop":
