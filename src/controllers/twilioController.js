@@ -1,5 +1,4 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
-import twilio from "twilio";
 
 export const voice = asyncHandler(async (req, res) => {
   res.set("Content-Type", "text/xml");
@@ -9,7 +8,10 @@ export const voice = asyncHandler(async (req, res) => {
       <Start>
         <Stream url="wss://${req.headers.host}" />
       </Start>
-      <Say>I will stream the next 60 seconds of audio</Say>
+      <Say>المساعد الذكي الأول للاتصالات: يمكنك من استقبال المكالمات وتحويلها إلى تذاكر أو إجراءات دون تدخل بشري.
+	•	جاهزية فورية للعمل: بمجرد تفعيل مُجيب، يبدأ في خدمة عملائك دون تدريب أو إعداد معقد.
+	•	توفير ساعات العمل: يُوفر وقت الفريق ويقلل من عدد المكالمات المتكررة بنسبة كبيرة.
+	•	مراقبة وتحسين مستمر: تقارير دورية وتحليلات فورية لتقييم أداء الخدمة واتخاذ قرارات سريعة.</Say>
       <Pause length="60" />
     </Response>`
   );

@@ -14,7 +14,7 @@ const request = {
   config: {
     encoding: "MULAW",
     sampleRateHertz: 16000,
-    languageCode: "ar-XA",
+    languageCode: "ar-SA",
   },
   interimResults: true,
 };
@@ -53,7 +53,7 @@ wss.on("connection", (ws) => {
         break;
       case "stop":
         console.log("Client stopped");
-        recongnizeStream.destroy();
+        recongnizeStream.destr();
         break;
     }
   });
