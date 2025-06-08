@@ -11,8 +11,8 @@ const client = new speech.SpeechClient();
 
 const request = {
   config: {
-    encoding: "MULAW",
-    sampleRateHertz: 8000,
+    encoding: "LINEAR16",
+    sampleRateHertz: 16000,
     languageCode: "ar-SA",
   },
   interimResults: true,
