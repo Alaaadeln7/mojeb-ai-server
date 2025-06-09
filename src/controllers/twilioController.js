@@ -3,7 +3,7 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 export const voice = asyncHandler(async (req, res) => {
   res.set("Content-Type", "text/xml");
 
-  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+  res.send(`
     <Response>
       <Start>
         <Stream url="wss://portfolioserver-0qyd.onrender.com/ws" />
