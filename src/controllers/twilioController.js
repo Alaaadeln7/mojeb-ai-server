@@ -4,7 +4,9 @@ export const voice = asyncHandler(async (req, res) => {
   res.set("Content-Type", "text/xml");
 
   res.send(
-    `<Response>
+    `
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Response>
       <Start>
         <Stream url="wss://portfolioserver-0qyd.onrender.com/ws" />
       </Start>
