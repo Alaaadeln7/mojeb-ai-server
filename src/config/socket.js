@@ -1,22 +1,10 @@
 import { WebSocketServer } from "ws";
 import http from "http";
 import express from "express";
-import speech from "@google-cloud/speech";
-
+import client from "../services/googleSTT.js";
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true });
-
-const client = new speech.SpeechClient();
-
-const request = {
-  config: {
-    encoding: "MULAW",
-    sampleRateHertz: 8000,
-    languageCode: "ar-SA",
-  },
-  interimResults: true,
-};
 
 wss.on("connection", (ws) => {
   console.log("New client connected");
@@ -77,7 +65,6 @@ wss.on("connection", (ws) => {
   });
 });
 
-// ✅ Upgrade handler to support WebSocket path /ws
 server.on("upgrade", (req, socket, head) => {
   if (req.url === "/ws") {
     wss.handleUpgrade(req, socket, head, (ws) => {
