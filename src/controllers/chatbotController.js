@@ -16,23 +16,31 @@ export const getChatbot = asyncHandler(async (req, res) => {
 
 // Add new inquiry to chatbot
 export const addInquiry = asyncHandler(async (req, res) => {
-  const { question, answer, chatbotId } = req.body;
+  const { question, answer, chatbotId, keyword } = req.body;
 
   const chatbot = await Chatbot.findById(chatbotId);
   if (!chatbot) {
     return responseHandler(res, 404, "Chatbot not found");
   }
+  const exists = chatbot.inquiries.some(
+    (inq) => inq.question === question || inq.keywords.includes(keyword)
+  );
 
-  chatbot.inquiries.push({ question, answer });
+  if (exists) {
+    return responseHandler(
+      res,
+      400,
+      "Inquiry with same question or keyword already exists"
+    );
+  }
+  chatbot.inquiries.push({ question, answer, keywords: [keyword] });
   await chatbot.save();
 
   return responseHandler(res, 201, "Inquiry added successfully", chatbot);
 });
 
-// Update existing inquiry
 export const updateInquiry = asyncHandler(async (req, res) => {
-  const { chatbotId, inquiryId } = req.params;
-  const { question, answer } = req.body;
+  const { question, answer, chatbotId, inquiryId } = req.body;
 
   const chatbot = await Chatbot.findById(chatbotId);
   if (!chatbot) {
