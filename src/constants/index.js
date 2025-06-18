@@ -1,10 +1,7 @@
 import { config } from "dotenv";
 config();
 export const CORSOPTIONS = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? process.env.CLIENT_URL
-      : "http://localhost:3000",
+  origin: [process.env.CLIENT_URL, "http://localhost:3000"],
   credentials: true,
 };
 export const JWT_EXPIRES_IN = "30d";

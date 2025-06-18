@@ -16,7 +16,7 @@ router.post("/create", protectRoute, checkAdminRole, createClient);
 router.get("/", protectRoute, checkAdminRole, getClients);
 router.get("/search/:search", protectRoute, checkAdminRole, searchClient);
 router.delete("/:id", protectRoute, checkAdminRole, deleteClient);
-router.get("/:id", protectRoute, checkAdminRole, getSingleClient);
+router.get("/:id", protectRoute, getSingleClient);
 router.put("/:id", protectRoute, checkAdminRole, updateClient);
 
 export default router;

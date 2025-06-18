@@ -12,17 +12,16 @@ import authRoutes from "./routes/authRoutes.js";
 import clientsRoutes from "./routes/clientsRoutes.js";
 import chatBotRoutes from "./routes/chatbotRoutes.js";
 import planRoutes from "./routes/plansRoutes.js";
-import callsRoutes from "./routes/callsRoutes.js";
 import twilioRoutes from "./routes/twilioRoutes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { app, server } from "./config/socket.js";
+// import { app } from "./config/socket.js";
 import MongoStore from "connect-mongo";
 config();
 
 connectDB();
-
+const app = express();
 app.use(
   session({
     secret: process.env.SECRET_KEY_SESSION,
@@ -77,14 +76,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/clients", clientsRoutes);
 app.use("/api/chatbot", chatBotRoutes);
 app.use("/api/plans", planRoutes);
-app.use("/api/calls", callsRoutes);
+
 app.use("/api/twilio", twilioRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log(`API Docs are available at http://localhost:${PORT}/api-docs`);
-  console.log("hello world");
 });

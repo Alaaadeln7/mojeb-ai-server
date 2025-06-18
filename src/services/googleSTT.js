@@ -1,10 +1,8 @@
 import speech from "@google-cloud/speech";
-import { config } from "dotenv";
-config();
-const client = new speech.SpeechClient({
-  credentials: {
-    client_email: process.env.CLIENT_GOOGLE_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY_STT,
-  },
+import credentials from "./speech-to-text-google.json" assert { type: "json" };
+
+const STTClient = new speech.SpeechClient({
+  credentials,
 });
-export default client;
+
+export default STTClient;

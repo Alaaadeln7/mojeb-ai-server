@@ -1,78 +1,136 @@
-import { WebSocketServer } from "ws";
-import http from "http";
+// import { WebSocketServer } from "ws";
+// import http from "http";
 import express from "express";
-import client from "../services/googleSTT.js";
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocketServer({ noServer: true });
 
-wss.on("connection", (ws) => {
-  console.log("New client connected");
-  let recognizeStream = null;
+export const app = express();
+// const server = http.createServer(app);
+// const wss = new WebSocketServer({ server });
 
-  ws.on("message", (message) => {
-    try {
-      const msg = JSON.parse(message);
-      switch (msg.event) {
-        case "connected":
-          console.log("Client connected");
-          recognizeStream = client
-            .streamingRecognize(request)
-            .on("error", (err) => {
-              console.error("STT error:", err);
-            })
-            .on("data", (data) => {
-              const transcription =
-                data.results[0]?.alternatives[0]?.transcript || "";
-              if (data.results[0]?.isFinal && transcription) {
-                ws.send(
-                  JSON.stringify({
-                    event: "transcription",
-                    data: transcription,
-                  })
-                );
-              }
-            });
-          break;
+// const requestConfig = {
+//   config: {
+//     encoding: "MULAW",
+//     sampleRateHertz: 8000,
+//     languageCode: "en-US",
+//   },
+//   interimResults: false,
+// };
 
-        case "start":
-          console.log("Client started");
-          break;
+// function findAnswer(transcript) {
+//   const fillerWords = [
+//     "okay",
+//     "ok",
+//     "yup",
+//     "yes",
+//     "alright",
+//     "hmm",
+//     "yeah",
+//     "sure",
+//     "uh-huh",
+//   ];
+//   const cleaned = transcript.toLowerCase().trim().split(" ");
+//   const filtered = cleaned
+//     .filter((word) => !fillerWords.includes(word))
+//     .join(" ");
 
-        case "media":
-          if (recognizeStream && msg.media.payload) {
-            const audioBuffer = Buffer.from(msg.media.payload, "base64");
-            recognizeStream.write(audioBuffer);
-          }
-          console.log(Buffer.from(msg.media.payload, "base64"));
-          break;
+//   for (const qa of qaDataset) {
+//     const keywords = qa.question.toLowerCase().split(" ");
+//     if (keywords.some((keyword) => filtered.includes(keyword))) {
+//       return qa.answer;
+//     }
+//   }
+//   return "Sorry, I didn't understand that.";
+// }
 
-        case "stop":
-          console.log("Client stopped");
-          if (recognizeStream) {
-            recognizeStream.destroy();
-          }
-          break;
-      }
-    } catch (err) {
-      console.error("Invalid WebSocket message:", err);
-    }
-  });
+// async function speakText(text, ws) {
+//   try {
+//     const request = {
+//       input: { text },
+//       voice: { languageCode: "en-US", ssmlGender: "NEUTRAL" },
+//       audioConfig: { audioEncoding: "MULAW", sampleRateHertz: 8000 },
+//     };
 
-  ws.on("close", () => {
-    if (recognizeStream) recognizeStream.destroy();
-    console.log("WebSocket connection closed");
-  });
-});
+//     ws.send(
+//       JSON.stringify({
+//         event: "start",
+//         media: {
+//           sampleRateHertz: 8000,
+//           audioEncoding: "MULAW",
+//           channels: 1,
+//         },
+//       })
+//     );
 
-server.on("upgrade", (req, socket, head) => {
-  if (req.url === "/ws") {
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit("connection", ws, req);
-    });
-  } else {
-    socket.destroy();
-  }
-});
+//     const [response] = await ttsClient.synthesizeSpeech(request);
+//     const audioBuffer = Buffer.from(response.audioContent);
+//     const chunkSize = 320;
+//     const chunkDurationMs = 40;
 
-export { app, server, wss };
+//     for (let i = 0; i < audioBuffer.length; i += chunkSize) {
+//       const chunk = audioBuffer.slice(i, i + chunkSize);
+//       ws.send(
+//         JSON.stringify({
+//           event: "media",
+//           media: { payload: chunk.toString("base64") },
+//         })
+//       );
+//       await new Promise((r) => setTimeout(r, chunkDurationMs));
+//     }
+
+//     ws.send(JSON.stringify({ event: "stop" }));
+//   } catch (error) {
+//     console.error("Error in speakText:", error);
+//     ws.send(JSON.stringify({ event: "error", message: error.message }));
+//   }
+// }
+
+// wss.on("connection", (ws) => {
+//   let recognizeStream = null;
+
+//   ws.on("message", async (message) => {
+//     const msg = JSON.parse(message);
+
+//     switch (msg.event) {
+//       case "connected":
+//         recognizeStream = speechClient
+//           .streamingRecognize(requestConfig)
+//           .on("error", (error) => {
+//             console.error("Recognition error:", error);
+//             ws.send(
+//               JSON.stringify({
+//                 event: "error",
+//                 message: "Speech recognition failed",
+//               })
+//             );
+//           })
+//           .on("data", async (data) => {
+//             const transcript = data.results[0]?.alternatives[0]?.transcript;
+//             if (transcript && data.results[0].isFinal) {
+//               console.log("User:", transcript);
+//               const answer = findAnswer(transcript);
+//               if (answer) {
+//                 console.log("Bot:", answer);
+//                 await speakText(answer, ws);
+//               } else {
+//                 console.log("Filler word or unclear.");
+//               }
+//             }
+//           });
+//         break;
+
+//       case "media":
+//         if (recognizeStream) {
+//           const audio = Buffer.from(msg.media.payload, "base64");
+//           recognizeStream.write(audio);
+//         }
+//         break;
+
+//       case "stop":
+//         if (recognizeStream) recognizeStream.end();
+//         break;
+//     }
+//   });
+// });
+
+// export { app, server, wss };
+
+// app

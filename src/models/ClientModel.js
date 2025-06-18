@@ -5,7 +5,7 @@ const clientSchema = new Schema(
     clientId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
       unique: true,
     },
     name: { type: String, required: true },
@@ -18,15 +18,13 @@ const clientSchema = new Schema(
     industry: { type: String, required: true },
     commercialRegister: { type: String, required: true },
     taxId: { type: String, required: true },
-    chatbot: {
+    chatbotId: {
       type: Schema.Types.ObjectId,
       ref: "Chatbot",
-      required: false,
     },
     subscription: {
       type: Schema.Types.ObjectId,
       ref: "Subscribe",
-      required: false,
     },
   },
   { timestamps: true }

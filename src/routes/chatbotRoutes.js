@@ -7,7 +7,7 @@ import {
 import { protectRoute } from "../middlewares/protectRoute.js";
 const router = express.Router();
 
-router.get("/:clientId", protectRoute, getChatbot);
-router.post("/:chatbotId/create", protectRoute, addInquiry);
-router.delete("/delete/:inquiryId", protectRoute, deleteInquiry);
+router.get("/:chatbotId", protectRoute, getChatbot);
+router.post("/create", protectRoute, addInquiry);
+router.delete("/delete", protectRoute, deleteInquiry);
 export default router;

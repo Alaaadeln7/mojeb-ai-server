@@ -1,14 +1,11 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import responseHandler from "../utils/response.js";
 import Chatbot from "../models/ChatbotModel.js";
-import Knowledge from "../models/KnowledgeModel.js";
 
+// Get chatbot by clientId
 export const getChatbot = asyncHandler(async (req, res) => {
-  const { clientId } = req.params;
-
-  const chatbot = await Chatbot.findOne({ clientId })
-    .populate("knowledge")
-    .select(" -__v");
+  const { chatbotId } = req.params;
+  const chatbot = await Chatbot.findById(chatbotId);
 
   if (!chatbot) {
     return responseHandler(res, 404, "Chatbot not found");
@@ -17,58 +14,54 @@ export const getChatbot = asyncHandler(async (req, res) => {
   return responseHandler(res, 200, "Chatbot fetched successfully", chatbot);
 });
 
+// Add new inquiry to chatbot
 export const addInquiry = asyncHandler(async (req, res) => {
-  const { chatbotId } = req.params;
-  const { question, answer } = req.body;
+  const { question, answer, chatbotId } = req.body;
 
-  const knowledge = await Knowledge.findOne({ chatbotId });
-  console.log(knowledge);
-  console.log(chatbotId);
-  if (!knowledge) {
-    return responseHandler(res, 404, "Knowledge not found");
+  const chatbot = await Chatbot.findById(chatbotId);
+  if (!chatbot) {
+    return responseHandler(res, 404, "Chatbot not found");
   }
 
-  knowledge.inquiries.push({ question, answer });
-  await knowledge.save();
+  chatbot.inquiries.push({ question, answer });
+  await chatbot.save();
 
-  return responseHandler(res, 200, "Inquiry added successfully", knowledge);
+  return responseHandler(res, 201, "Inquiry added successfully", chatbot);
 });
 
+// Update existing inquiry
 export const updateInquiry = asyncHandler(async (req, res) => {
-  const { chatbotId, index } = req.params;
+  const { chatbotId, inquiryId } = req.params;
   const { question, answer } = req.body;
 
-  const knowledge = await Knowledge.findOne({ chatbotId });
-  if (!knowledge) {
-    return responseHandler(res, 404, "Knowledge not found");
+  const chatbot = await Chatbot.findById(chatbotId);
+  if (!chatbot) {
+    return responseHandler(res, 404, "Chatbot not found");
   }
 
-  if (!knowledge.inquiries[index]) {
+  const inquiry = chatbot.inquiries.id(inquiryId);
+  if (!inquiry) {
     return responseHandler(res, 404, "Inquiry not found");
   }
 
-  if (question) knowledge.inquiries[index].question = question;
-  if (answer) knowledge.inquiries[index].answer = answer;
+  if (question) inquiry.question = question;
+  if (answer) inquiry.answer = answer;
 
-  await knowledge.save();
-
-  return responseHandler(res, 200, "Inquiry updated successfully", knowledge);
+  await chatbot.save();
+  return responseHandler(res, 200, "Inquiry updated successfully", chatbot);
 });
 
+// Delete inquiry from chatbot
 export const deleteInquiry = asyncHandler(async (req, res) => {
-  const { inquiryId } = req.params;
+  const { chatbotId, inquiryId } = req.body;
 
-  const knowledge = await Knowledge.findOne({ inquiryId });
-  if (!knowledge) {
-    return responseHandler(res, 404, "Knowledge not found");
+  const chatbot = await Chatbot.findById(chatbotId);
+  if (!chatbot) {
+    return responseHandler(res, 404, "Chatbot not found");
   }
 
-  if (!knowledge.inquiries[index]) {
-    return responseHandler(res, 404, "Inquiry not found");
-  }
+  chatbot.inquiries.pull(inquiryId);
+  await chatbot.save();
 
-  knowledge.inquiries.splice(index, 1);
-  await knowledge.save();
-
-  return responseHandler(res, 200, "Inquiry deleted successfully", knowledge);
+  return responseHandler(res, 200, "Inquiry deleted successfully", chatbot);
 });
