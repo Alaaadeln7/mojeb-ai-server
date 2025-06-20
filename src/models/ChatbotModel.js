@@ -18,7 +18,7 @@ const chatbotSchema = new Schema(
           type: String,
           required: false,
         },
-        keywords: [String],
+        keyword: { type: String },
       },
     ],
   },

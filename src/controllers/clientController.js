@@ -113,7 +113,7 @@ export const getClients = asyncHandler(async (req, res) => {
 
 export const getSingleClient = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const client = await Client.findOne({ userId: id });
+  const client = await Client.findOne({ clientId: id });
   if (!client) {
     return responseHandler(res, 404, "Client not found");
   }
@@ -146,4 +146,52 @@ export const searchClient = asyncHandler(async (req, res) => {
   });
 
   return responseHandler(res, 200, "Clients fetched successfully", clients);
+});
+
+export const toggleEmailNotification = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const client = await Client.findById(id);
+  if (!client) {
+    return responseHandler(res, 404, "Client not found");
+  }
+  client.emailNotification = !client.emailNotification;
+  await client.save();
+  return responseHandler(res, 200, "Email notification updated successfully");
+});
+
+export const togglePlanUsageAlert = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const client = await Client.findById(id);
+  if (!client) {
+    return responseHandler(res, 404, "Client not found");
+  }
+  client.planUsageAlert = !client.planUsageAlert;
+  await client.save();
+  return responseHandler(res, 200, "plan usage alert updated successfully");
+});
+
+export const togglePerformanceReports = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const client = await Client.findById(id);
+  if (!client) {
+    return responseHandler(res, 404, "Client not found");
+  }
+  client.performanceReports = !client.performanceReports;
+  await client.save();
+  return responseHandler(res, 200, "preformance reports updated successfully");
+});
+
+export const toggleTicketEscalationAlert = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const client = await Client.findById(id);
+  if (!client) {
+    return responseHandler(res, 404, "Client not found");
+  }
+  client.ticketEscalationAlert = !client.ticketEscalationAlert;
+  await client.save();
+  return responseHandler(
+    res,
+    200,
+    "ticket escalation alert updated successfully"
+  );
 });

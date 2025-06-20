@@ -16,7 +16,7 @@ import { checkAdminRole } from "../middlewares/checkUserRole.js";
 const router = express.Router();
 
 // router.post("/verify-otp", verifyOTP);
-router.post("/create-user", protectRoute, checkAdminRole, createUser);
+router.post("/create-user", createUser);
 router.post("/login", login);
 router.post("/logout", logout);
 router.get("/check-auth", protectRoute, checkAuth);

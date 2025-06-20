@@ -26,6 +26,10 @@ const clientSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Subscribe",
     },
+    emailNotification: { type: Boolean, default: false },
+    planUsageAlert: { type: Boolean, default: false },
+    performanceReports: { type: Boolean, default: false },
+    ticketEscalationAlert: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

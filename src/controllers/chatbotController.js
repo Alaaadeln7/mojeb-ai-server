@@ -23,7 +23,7 @@ export const addInquiry = asyncHandler(async (req, res) => {
     return responseHandler(res, 404, "Chatbot not found");
   }
   const exists = chatbot.inquiries.some(
-    (inq) => inq.question === question || inq.keywords.includes(keyword)
+    (inq) => inq.question === question || inq.keyword === keyword
   );
 
   if (exists) {
@@ -33,14 +33,14 @@ export const addInquiry = asyncHandler(async (req, res) => {
       "Inquiry with same question or keyword already exists"
     );
   }
-  chatbot.inquiries.push({ question, answer, keywords: [keyword] });
+  chatbot.inquiries.push({ question, answer, keyword });
   await chatbot.save();
 
-  return responseHandler(res, 201, "Inquiry added successfully", chatbot);
+  return responseHandler(res, 201, "Inquiry added successfully");
 });
 
 export const updateInquiry = asyncHandler(async (req, res) => {
-  const { question, answer, chatbotId, inquiryId } = req.body;
+  const { question, answer, chatbotId, inquiryId, keyword } = req.body;
 
   const chatbot = await Chatbot.findById(chatbotId);
   if (!chatbot) {
@@ -54,7 +54,7 @@ export const updateInquiry = asyncHandler(async (req, res) => {
 
   if (question) inquiry.question = question;
   if (answer) inquiry.answer = answer;
-
+  if (keyword) inquiry.keyword = keyword;
   await chatbot.save();
   return responseHandler(res, 200, "Inquiry updated successfully", chatbot);
 });
