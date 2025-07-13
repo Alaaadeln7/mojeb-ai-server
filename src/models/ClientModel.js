@@ -30,6 +30,8 @@ const clientSchema = new Schema(
     planUsageAlert: { type: Boolean, default: false },
     performanceReports: { type: Boolean, default: false },
     ticketEscalationAlert: { type: Boolean, default: false },
+    slackUserId: { type: String, required: false },
+    slackAccessToken: { type: String, required: false },
   },
   { timestamps: true }
 );

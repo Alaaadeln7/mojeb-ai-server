@@ -1,6 +1,10 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 
 export const voice = asyncHandler(async (req, res) => {
+  const from = req.body.From;
+  const to = req.body.To;
+  console.log(from);
+  console.log(to);
   res.set("Content-Type", "text/xml");
   res.send(`<Response>
         <Start>

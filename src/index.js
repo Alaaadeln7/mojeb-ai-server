@@ -3,7 +3,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 import swaggerSpec from "./docs/swaggerDocs.js";
 import connectDB from "./config/connectedDB.js";
 import { CORSOPTIONS, RATE_LIMIT_OPTIONS } from "./constants/index.js";
@@ -16,12 +16,13 @@ import twilioRoutes from "./routes/twilioRoutes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-// import { app } from "./config/socket.js";
+import { app, server } from "./config/socket.js";
 import MongoStore from "connect-mongo";
+// import { integrationSlack } from "./config/slack.js";
 config();
-
+// integrationSlack();
 connectDB();
-const app = express();
+
 app.use(
   session({
     secret: process.env.SECRET_KEY_SESSION,
@@ -63,10 +64,10 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 // Rate limiting
-const limiter = rateLimit(RATE_LIMIT_OPTIONS);
-app.use(limiter);
+// const limiter = rateLimit(RATE_LIMIT_OPTIONS);
+// app.use(limiter);
 
-app.use(rateLimit(RATE_LIMIT_OPTIONS));
+// app.use(rateLimit(RATE_LIMIT_OPTIONS));
 app.use(express.json({ limit: "10mb" }));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -82,7 +83,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log(`API Docs are available at http://localhost:${PORT}/api-docs`);
 });
