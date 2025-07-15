@@ -141,13 +141,11 @@ export const login = asyncHandler(async (req, res) => {
 export const logout = asyncHandler(async (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
-    expires: new Date(0),
-  });
-  res.clearCookie("token", {
-    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
+    expires: new Date(0),
   });
+
   return responseHandler(res, 200, USER_LOGOUT_SUCCESS);
 });
 
