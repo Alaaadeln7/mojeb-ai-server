@@ -13,6 +13,7 @@ import clientsRoutes from "./routes/clientsRoutes.js";
 import chatBotRoutes from "./routes/chatbotRoutes.js";
 import planRoutes from "./routes/plansRoutes.js";
 import twilioRoutes from "./routes/twilioRoutes.js";
+import enrollmentFormRoutes from "./routes/enrollmentForm.routes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -69,16 +70,17 @@ app.use(cookieParser());
 
 // app.use(rateLimit(RATE_LIMIT_OPTIONS));
 app.use(express.json({ limit: "10mb" }));
+const api_prefix = "/api";
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(`${api_prefix}-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use("/api/auth", authRoutes);
-// app.use("/api/notifications", notificationRoutes);
-app.use("/api/clients", clientsRoutes);
-app.use("/api/chatbot", chatBotRoutes);
-app.use("/api/plans", planRoutes);
-
-app.use("/api/twilio", twilioRoutes);
+app.use(`${api_prefix}/auth`, authRoutes);
+// app.use(`${api_prefix}/notifications`, notificationRoutes);
+app.use(`${api_prefix}/clients`, clientsRoutes);
+app.use(`${api_prefix}/chatbot`, chatBotRoutes);
+app.use(`${api_prefix}/plans`, planRoutes);
+app.use(`${api_prefix}/enrollment-form`, enrollmentFormRoutes);
+app.use(`${api_prefix}/twilio`, twilioRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });

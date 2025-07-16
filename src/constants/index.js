@@ -6,7 +6,7 @@ export const CORSOPTIONS = {
 };
 export const JWT_EXPIRES_IN = "30d";
 export const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
-export const JWT_COOKIE_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+export const JWT_COOKIE_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000;
 export const JWT_COOKIE_NAME = "token";
 export const JWT_COOKIE_OPTIONS = {
   expires: new Date(Date.now() + JWT_COOKIE_EXPIRES_IN),
