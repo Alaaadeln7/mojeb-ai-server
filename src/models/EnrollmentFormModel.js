@@ -12,7 +12,12 @@ const enrollmentFormSchema = new Schema(
     commercialRegister: { type: String, required: true },
     taxId: { type: String, required: true },
     message: { type: String, required: true },
-    status: { type: String, required: true, default: "pending" },
+    status: {
+      type: String,
+      required: true,
+      default: "pending",
+      enum: ["pending", "accepted", "rejected"],
+    },
   },
   { timestamps: true }
 );

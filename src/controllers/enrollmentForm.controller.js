@@ -79,7 +79,12 @@ export const rejectedEnrollmentFormStatus = asyncHandler(async (req, res) => {
     });
   }
 });
+
 export const getAllEnrollmentForms = asyncHandler(async (req, res) => {
+  // const page = parseInt(req.query.page) || process.env.DEFAULT_PAGE_COUNT;
+  // const limit = parseInt(req.query.limit) || process.env.DEFAULT_LIMIT_COUNT;
+  // const skip = (page - 1) * limit;
+  // const totalEnrollmentForms = await EnrollmentForm.countDocuments();
   try {
     const enrollmentForms = await EnrollmentForm.find().select("-__v");
 
@@ -93,6 +98,7 @@ export const getAllEnrollmentForms = asyncHandler(async (req, res) => {
     return responseHandler(res, 500, "Error fetching enrollment forms");
   }
 });
+
 export const getEnrollmentFormById = asyncHandler(async (req, res) => {
   try {
     const enrollmentForm = await EnrollmentForm.findById(req.params.id);

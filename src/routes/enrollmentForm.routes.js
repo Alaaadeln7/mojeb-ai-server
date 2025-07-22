@@ -14,5 +14,5 @@ router.get("/", getAllEnrollmentForms);
 router.get("/:id", getEnrollmentFormById);
 router.put("/accepted-status/:id", acceptedEnrollmentFormStatus);
 router.put("/rejected-status/:id", rejectedEnrollmentFormStatus);
-router.delete("/:id", deleteEnrollmentForm);
+router.delete("/delete/:id", deleteEnrollmentForm);
 export default router;
