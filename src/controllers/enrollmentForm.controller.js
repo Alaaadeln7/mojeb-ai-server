@@ -132,3 +132,26 @@ export const deleteEnrollmentForm = asyncHandler(async (req, res) => {
     return responseHandler(res, 500, "Error deleting enrollment form");
   }
 });
+
+export const searchEnrollmentForms = asyncHandler(async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) return res.status(400).json({ message: "Query is required" });
+
+    const enrollmentForms = await EnrollmentForm.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+        { company: { $regex: query, $options: "i" } },
+      ],
+    });
+    return responseHandler(
+      res,
+      200,
+      "Enrollment forms fetched successfully",
+      enrollmentForms
+    );
+  } catch (error) {
+    return responseHandler(res, 500, "Error fetching enrollment forms");
+  }
+});

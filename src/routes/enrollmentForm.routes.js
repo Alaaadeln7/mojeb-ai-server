@@ -6,9 +6,11 @@ import {
   getAllEnrollmentForms,
   getEnrollmentFormById,
   rejectedEnrollmentFormStatus,
+  searchEnrollmentForms,
 } from "../controllers/enrollmentForm.controller.js";
 
 const router = express.Router();
+router.get("/search", searchEnrollmentForms);
 router.post("/create", createEnrollmentForm);
 router.get("/", getAllEnrollmentForms);
 router.get("/:id", getEnrollmentFormById);
