@@ -8,7 +8,7 @@ import swaggerSpec from "./docs/swaggerDocs.js";
 import connectDB from "./config/connectedDB.js";
 import { CORSOPTIONS, RATE_LIMIT_OPTIONS } from "./constants/index.js";
 import authRoutes from "./routes/authRoutes.js";
-// import notificationRoutes from "./routes/notificationRoutes.js";
+import notificationRoutes from "./routes/notifications.routes.js";
 import clientsRoutes from "./routes/clientsRoutes.js";
 import chatBotRoutes from "./routes/chatbotRoutes.js";
 import planRoutes from "./routes/plansRoutes.js";
@@ -75,7 +75,7 @@ const api_prefix = "/api";
 app.use(`${api_prefix}-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(`${api_prefix}/auth`, authRoutes);
-// app.use(`${api_prefix}/notifications`, notificationRoutes);
+app.use(`${api_prefix}/notifications`, notificationRoutes);
 app.use(`${api_prefix}/clients`, clientsRoutes);
 app.use(`${api_prefix}/chatbot`, chatBotRoutes);
 app.use(`${api_prefix}/plans`, planRoutes);

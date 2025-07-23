@@ -21,6 +21,7 @@ import {
   sendVerificationEmail,
 } from "../middlewares/generateOTP.js";
 import OTP from "../models/OtpModel.js";
+import Notification from "../models/NotificationModel.js";
 
 // export const register = asyncHandler(async (req, res) => {
 //   const { fullName, email, password } = req.body;
@@ -135,6 +136,11 @@ export const login = asyncHandler(async (req, res) => {
     return responseHandler(res, 400, INVALID_PASSWORD);
   }
   generateToken(res, userExists?._id);
+  await Notification.create({
+    userId: userExists._id,
+    message: "You have successfully logged in.",
+    type: "info",
+  });
   return responseHandler(res, 200, USER_LOGIN_SUCCESS);
 });
 
