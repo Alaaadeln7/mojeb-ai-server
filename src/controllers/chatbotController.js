@@ -2,16 +2,38 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 import responseHandler from "../utils/response.js";
 import Chatbot from "../models/ChatbotModel.js";
 import textToSpeech from "@google-cloud/text-to-speech";
+
 // Get chatbot by clientId
 export const getChatbot = asyncHandler(async (req, res) => {
   const { chatbotId } = req.params;
-  const chatbot = await Chatbot.findById(chatbotId);
+  const page =
+    parseInt(req.query.page) || parseInt(process.env.DEFAULT_PAGE_COUNT) || 1;
+  const limit =
+    parseInt(req.query.limit) ||
+    parseInt(process.env.DEFAULT_LIMIT_COUNT) ||
+    10;
+  const skip = (page - 1) * limit;
 
-  if (!chatbot) {
+  const chatbotDoc = await Chatbot.findById(chatbotId);
+
+  if (!chatbotDoc) {
     return responseHandler(res, 404, "Chatbot not found");
   }
 
-  return responseHandler(res, 200, "Chatbot fetched successfully", chatbot);
+  const total = chatbotDoc.inquiries?.length || 0;
+  const paginatedInquiries =
+    chatbotDoc.inquiries?.slice(skip, skip + limit) || [];
+
+  return responseHandler(res, 200, "Chatbot fetched successfully", {
+    total,
+    page,
+    limit,
+    description: chatbotDoc.description,
+    totalPages: Math.ceil(total / limit),
+    hasNextPage: page * limit < total,
+    hasPreviousPage: page > 1,
+    data: paginatedInquiries,
+  });
 });
 
 // Add new inquiry to chatbot
@@ -74,14 +96,25 @@ export const deleteInquiry = asyncHandler(async (req, res) => {
   return responseHandler(res, 200, "Inquiry deleted successfully", chatbot);
 });
 
+export const addDescription = asyncHandler(async (req, res) => {
+  const { description, chatbotId } = req.body;
+  const chatbot = await Chatbot.findById(chatbotId);
+  if (!chatbot) {
+    return responseHandler(res, 404, "Chatbot not found");
+  }
+  chatbot.description = description;
+  await chatbot.save();
+  return responseHandler(res, 200, "Description added successfully");
+});
+
 export const testAudio = asyncHandler(async (req, res) => {
   const client = new textToSpeech.TextToSpeechClient({
     credentials: {
       type: "service_account",
       project_id: "mujib-ai",
-      private_key_id: "5fcda2608fad373b962bd96ea2576fad87b22c9d",
+      private_key_id: "992dab131e12896e6ceb1fcb2d595234b133b7fb",
       private_key:
-        "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCjiCr7OMqE9efe\nTu72G8LlDiUohhanYUs+2GBTzKAHZlBPBLJAARk2+80/wrE/rcJF7gURqyPEsedU\nR6oGIhza/mwpU/nkyiASu8oUE5WBVgNQ7R5Dtzqcskr1+ZaAsa2EA/17vaY1TB5K\nu062gOGr9WD5n3oZ7tCecVglo7yslP/eXnIYaqbYdTTiiP5G46nZ+CtHtGjhFnlH\nvxX+d1fpoq0/5zJNO5grBV0wQHhMjgC5cwJsYzp19CD+muLKx4TZyhA6ga1ywZa5\njMrWQCIoT1LwCHO1zl1F6xMOYy4yRjpGFJklXPIuOrX2uAB56AmoWjwjQrG8oSOw\nLbIQ7j8dAgMBAAECggEASICWjcsf/tMHegiE6ZhlUCh1UQIiCROZyMMl8gFG8gDq\nmh366WWTSE1bMmmfLBxdhaOBm9PEh/BYH4WmXBHDuVQToD8bC9SRY7zeWwhTwIPh\n9H8sa9lQoyhpE6UUlPoxc9ZRDAuJJRgaVge1XjTF2PdxhzqtZ9H5rEWUTxvJCrpO\n0rkVzSldrOrBFpXLrv/78viLK169Ionnnj3AulCwtjMiSjHZO8rFxqZHTc5Kt2No\n1q8jupZqGpgcHBc35FINpkj6UtU0OvnfiXtrkq5dn/PIqLjZO6bIbqfGtODM/A2A\nnOltQqMw2tDO02HOR+HMHkzZjJc3+fkTCAaE2Zh6AQKBgQDbu+L1Xp97bpjsLoMj\nOGCickeKheA4uJ+2+hAFsts8rTE/HutbJENVTxhJqxFavmliZNzA8CkauqSpyNrO\nwtL9Lne9lMVMa232O+SqgHFLxIVBsyFg4QHQZQwHz5l7ueaemD2t3F1mUMF2d4lZ\neumxLQJtE3PSkMrwbQqSO8O/MwKBgQC+haetKgMuCV0BpJi5vucFQ7QHEPdbAF3b\n41iEhhl4x2eg5roeXsjhuAOCJSJ+ffK2oRAaNctH5iVBvuJMdUJ38rwLWpp787+o\nWwXThhKkFCEcQ6fm8z+Lj8/puV1qmoldR2hPRFefDfPOZxIpcrqBFH9aHXmvp3UZ\nUHH0IZhIbwKBgCLV+LdZ1wLkl83p2dR9naRjZcAqVU/oxTlnD583qdZGxuXw6vM6\nHoqpzXnwawHt6hs1TmIwMPQR3wUj2Lyq2nRVJ5qguV7SMU62VBxL3Kpcb5vo4EPR\nqE33lx6t5PFemZdPH4guxYfxCZrUfKv49o+mSRot2VDqr6HKR8DDRNdNAoGAQ550\nMIVks4YnOFoOyn3yyG+LCab/45Bxv4Uk+YQOrks3gGfjTrwdV99Tf3FmmLZi2ma3\nrFXDXDVWq8rvzmsfuCqyiuURR0TvlPUZUEWZgBqU1c89XD6hIwtbo3xip19JuY2K\ne/epkY4GJg925rcNcpqvyHAFrE4mxWFD0H3L6okCgYEAuP0/g7q1fDJ0IXm9Yy9D\naDsNUiXzdltLoT4Qtica+rGYhg/1CrmMLkZahIv2FkKHwYbXbG0MAM3Zpq5SLW7U\n9sbGVqb/A2K6TWCPKEVa/71tUzslKG0zfsb+HoCQZyYCAixrta23PnqsqJ+6fSqt\nw33R0Z7PmKM1T7WL5d1iAj0=\n-----END PRIVATE KEY-----\n",
+        "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDPuB4kfxd5d//5\ntSWNgOyHzOJmS0YHbQcUZO40BNkCkZ0L1/K/HupHV2oucgf42a7F1A6gA+mqO08g\nlETtIoOfc/IdRd9+K1tnNwcSofusOEk/zyfPdlQ66LtgMdTzP/+R0FqFErSJnOVZ\nddbAv3Bi3s//6TV3OP2ZqLsYMaQzLbiDOsvECd/tymTyl/qxDgeeEp5tfn6Jn+rf\nbpDSu6cBVMUe2iEBHYoe//tyLO21BY8HEGW1XqnjGQq4Pyuz+2Iq/i8zfr09BKRz\nCRmnrGueZshZ4HGlJKMf1nsotULJzDZyiqn5kY0gUsY4PH/PMiKVJg6PH2CN0y9p\npX3KzSZvAgMBAAECggEADZmth5A2tkJQJUZiDhDJ695TWIVHMYdG9mPhYNCMcOmd\n0b+y6iaZClDD6ASZVwbRtaw7xOhcrUOy25w5oxkmaxNJX/dKOdWW53wn32VxuAX7\nbc0feyrxOuYwFo1MtxySnDZ7JslhvrziG2hmxjoCnsad8dCQKp01pZDxpxTg/mS6\nu/wqlATGv4BrHRnnnXedZRphWeTfOTztwUlImXIhmIrojY89lSiBbtDUek6UOtBS\nFUTsm6lp6T3JXGm94xXUfNmJeICFCCMpbwS69MnVlaf8iinGPHxXVBPD5UBnAHT9\nELR/+bZv/xHQBINa0BbjGrtkvvqgeQ3L3U2tJBO5kQKBgQDxs32RxDx7z7IaVivP\nU5YvXxfuTKqU0QXiL+pntzsJ6LvpuGwTeidb7Pxpf+OXb5skeMLIUo+nsVkst5pB\nTXB698BzMyJ0NnP4D+Ze7R3wUrWkxxwqfM09WUh+4RhpDtRTIjAbN2U13OzjI46P\nud6PGcFJCEqS7zWMG7v6o6U/9wKBgQDcAfqF71/t6j2aC/w0eIo6ZzQNt9A1AVFe\nZ2KjfFijnlL9YNWN1N88YA47T/Lq63nBRBYE65ttqYEwQuuI7UVszCXKrOWmWp06\nP1R8thg2t6RcLnW97LT0hDUYFIaznbxQ/J4NSL2we+g9BzvZU5HKJy8b5Eu8387N\naw2zA8kfSQKBgHS1A7QH+mCaWFiJNVxF8yXql+aUFGYJS/r8wgXUnuhY/auMRntd\nJ3Ymx3a1rxKnbFU/DmamHwGNDA8glJZlqyNlUAMQNNnClVq5arZ5blRly5nGHt6R\nJpUx8GR7kkrgQzvlLS9nHzLT+3pt59+Uk1eryv3VyBSM9uExXyJWNGvfAoGAQy4n\nfbZ2qIOag+uc+7jDHMpezsGORmE8o4MWT62ss2mpFc335/NUp279aYckOi/lYeqU\nfrQjJf1YgZAttAYf6PT9pUHebknFMQAdoGdKRYsWGT/mnDQnnXKxc8TwzPAhjOlW\nqd/IbJepdtk6oUYvgncsn2u65NXCpF9IM524UGECgYEAl1v3W1nr+rZKDDANDAZ3\nhAlmpNVVzDwZXZyIcpYlIZkX4Viq3PQX6qmltfZ8i+xI0+dV99gSi//70bUSRP7h\nEFz/zwh8bWN0qeWR07qJOmFYuxGLbVKYCJrTUtqjWNt+i6vnaHz566vG7MxI07B6\nRW1DDkNpWw3e49PYHoPXrA4=\n-----END PRIVATE KEY-----\n",
       client_email: "op-demo@mujib-ai.iam.gserviceaccount.com",
       client_id: "108203808526788365034",
       auth_uri: "https://accounts.google.com/o/oauth2/auth",
@@ -92,14 +125,11 @@ export const testAudio = asyncHandler(async (req, res) => {
       universe_domain: "googleapis.com",
     },
   });
-  const { text, languageCode, voiceName } = req.body;
-  console.log(
-    "credintials  google text to speech",
-    process.env.GOOGLE_TEXT_TO_SPEECH
-  );
+  const { text, languageCode, voice } = req.body;
+  console.log(text, languageCode, voice);
   const request = {
     input: { text },
-    voice: { languageCode, name: voiceName },
+    voice: { languageCode, name: voice },
     audioConfig: { audioEncoding: "MP3" },
   };
 
@@ -110,6 +140,6 @@ export const testAudio = asyncHandler(async (req, res) => {
     res.send(response.audioContent);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "TTS failed" });
+    res.status(500).json({ error: "failed" + error });
   }
 });

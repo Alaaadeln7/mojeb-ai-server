@@ -8,6 +8,7 @@ const chatbotSchema = new Schema(
       required: true,
       unique: true,
     },
+    description: { type: String, required: false },
     inquiries: [
       {
         question: {
