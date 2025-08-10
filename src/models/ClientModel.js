@@ -32,6 +32,9 @@ const clientSchema = new Schema(
     ticketEscalationAlert: { type: Boolean, default: false },
     slackUserId: { type: String, required: false },
     slackAccessToken: { type: String, required: false },
+    IntegrationWhatsapp: { type: Boolean, required: false },
+    IntegrationGoogleCalender: { type: Boolean, required: false },
+    IntegrationSlack: { type: Boolean, required: false },
   },
   { timestamps: true }
 );

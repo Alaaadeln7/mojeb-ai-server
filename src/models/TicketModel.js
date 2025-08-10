@@ -1,19 +1,20 @@
 import { Schema, model } from "mongoose";
-import { BOT_STATUS } from "../constants/index.js";
-const { PENDING, COMPLETED, PROGRESS } = BOT_STATUS;
-const ticketSchema = new Schema(
+
+const TicketSchema = new Schema(
   {
-    name: { type: String, required: true },
-    description: { type: String, required: true },
+    to: { type: String, required: true },
+    from: { type: String, required: true },
     status: {
       type: String,
-      enum: [PENDING, PROGRESS, COMPLETED],
-      default: PENDING,
+      required: true,
+      default: "pending",
+      enum: ["pending", "accepted", "rejected"],
     },
-    scheduledAt: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const Ticket = model("Ticket", ticketSchema);
-export default Task;
+const Ticket = model("Ticket", TicketSchema);
+export default Ticket;

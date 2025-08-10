@@ -14,6 +14,7 @@ import chatBotRoutes from "./routes/chatbotRoutes.js";
 import planRoutes from "./routes/plansRoutes.js";
 import twilioRoutes from "./routes/twilioRoutes.js";
 import enrollmentFormRoutes from "./routes/enrollmentForm.routes.js";
+import ticketRoutes from "./routes/ticket.routes.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -81,6 +82,7 @@ app.use(`${api_prefix}/chatbot`, chatBotRoutes);
 app.use(`${api_prefix}/plans`, planRoutes);
 app.use(`${api_prefix}/enrollment-form`, enrollmentFormRoutes);
 app.use(`${api_prefix}/twilio`, twilioRoutes);
+app.use(`${api_prefix}/tickets`, ticketRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });

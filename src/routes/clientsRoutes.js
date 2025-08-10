@@ -10,6 +10,7 @@ import {
   togglePlanUsageAlert,
   toggleTicketEscalationAlert,
   updateClient,
+  whatsappIntegration,
 } from "../controllers/clientController.js";
 import { protectRoute } from "../middlewares/protectRoute.js";
 import { checkAdminRole } from "../middlewares/checkUserRole.js";
@@ -30,4 +31,5 @@ router.post(
   protectRoute,
   toggleTicketEscalationAlert
 );
+router.post("/whatsapp", whatsappIntegration);
 export default router;
